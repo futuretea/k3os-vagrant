@@ -1,6 +1,6 @@
 # k3os-vagrant
 
-## build libvirt box with packer
+## build box
 ```bash
 sudo packer build ./template.json
 ```
