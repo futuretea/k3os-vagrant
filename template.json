@@ -1,0 +1,46 @@
+{
+  "builders": [
+    {
+      "boot_command": [
+        "rancher",
+        "<enter>",
+        "sudo k3os install",
+        "<enter>",
+        "1",
+        "<enter>",
+        "y",
+        "<enter>",
+        "http://{{ .HTTPIP }}:{{ .HTTPPort }}/config.yml",
+        "<enter>",
+        "y",
+        "<enter>"
+      ],
+      "boot_wait": "1m",
+      "http_directory": ".",
+      "iso_checksum": "sha256:{{user `iso_checksum`}}",
+      "iso_url": "{{user `iso_url`}}",
+      "shutdown_command": "sudo poweroff",
+      "shutdown_timeout": "10s",
+      "ssh_timeout": "5m",
+      "ssh_username": "rancher",
+      "ssh_password": "vagrant",
+      "disk_size": "200000",
+      "type": "qemu",
+      "format": "qcow2",
+      "accelerator": "kvm",
+      "net_device": "virtio-net",
+      "disk_interface": "virtio"
+    }
+  ],
+  "post-processors": [
+    {
+      "output": "_output/k3os_{{.Provider}}.box",
+      "type": "vagrant"
+    }
+  ],
+  "variables": {
+    "iso_checksum": "1745b59937e497c0dee3247d27b00576e17b271c82493b3796f3494f9d667038",
+    "iso_url": "https://github.com/rancher/k3os/releases/download/v0.19.4-dev.5/k3os-amd64.iso"
+  }
+}
+
