@@ -39,8 +39,8 @@
     }
   ],
   "variables": {
-    "iso_checksum": "1745b59937e497c0dee3247d27b00576e17b271c82493b3796f3494f9d667038",
-    "iso_url": "https://github.com/rancher/k3os/releases/download/v0.19.4-dev.5/k3os-amd64.iso"
+    "iso_checksum": "fa4d95676ddf94b8a5488781c638ca13b6c532ea06bb74d2bcefd194b5ce760b",
+    "iso_url": "https://github.com/rancher/k3os/releases/download/v0.19.5-rc.1/k3os-amd64.iso"
   }
 }
 

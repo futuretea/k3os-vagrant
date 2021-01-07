@@ -49,6 +49,7 @@ k3os:
   password: vagrant
   k3s_args:
     - server
+    - --cluster-init
 EOF
 reboot
 SHELL
