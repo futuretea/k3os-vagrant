@@ -22,8 +22,8 @@ Vagrant.configure("2") do |config|
       node.vm.synced_folder '.', '/vagrant', disabled: true
       node.vm.provider :libvirt do |domain|
         domain.driver = 'kvm'
-        domain.memory = 4096
-        domain.cpus = 4
+        domain.memory = 8192
+        domain.cpus = 8
         domain.nested = true
         domain.management_network_name = "k3os"
         domain.management_network_address = "10.5.8.0/24"
@@ -41,10 +41,12 @@ hostname: "k3os#{i}"
 k3os:
   modules:
     - kvm
-    - vhost-net
+    - vhost_net
   dns_nameservers:
     - 223.5.5.5
     - 8.8.8.8
+  ntpServers:
+    - ntp.ubuntu.com
   token: vagrant
   password: vagrant
   k3s_args:
@@ -69,8 +71,8 @@ Vagrant.configure("2") do |config|
       node.vm.synced_folder '.', '/vagrant', disabled: true
       node.vm.provider :libvirt do |domain|
         domain.driver = 'kvm'
-        domain.memory = 4096
-        domain.cpus = 4
+        domain.memory = 8192
+        domain.cpus = 8
         domain.nested = true
         domain.management_network_name = "k3os"
         domain.management_network_address = "10.5.8.0/24"
@@ -88,10 +90,12 @@ hostname: "k3os#{i}"
 k3os:
   modules:
     - kvm
-    - vhost-net
+    - vhost_net
   dns_nameservers:
     - 223.5.5.5
     - 8.8.8.8
+  ntpServers:
+    - ntp.ubuntu.com
   token: vagrant
   password: vagrant
   k3s_args:
