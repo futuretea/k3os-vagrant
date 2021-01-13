@@ -52,6 +52,10 @@ k3os:
   k3s_args:
     - server
     - --cluster-init
+    - --disable
+    - local-storage
+    - --node-label
+    - svccontroller.k3s.cattle.io/enablelb=true
 EOF
 reboot
 SHELL
