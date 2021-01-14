@@ -31,74 +31,9 @@ Vagrant.configure("2") do |config|
         domain.storage :file, :size => '200G', :bus => 'virtio'
         domain.storage :file, :size => '100G', :bus => 'virtio'
       end
-      node.vm.provision 'shell',
-      upload_path: '/home/rancher/vagrant-shell',
-      inline: <<-SHELL
-      mkdir -p /mnt
-      mount /dev/vda1 /mnt
-      cat > /mnt/k3os/system/config.yaml <<EOF
-hostname: "k3os#{i}"
-boot_cmd:
-- rc-update add k3s-restarter.service
-write_files:
-- content: |
-    #!/usr/bin/env bash
-
-    echo "\\\$\\\$" >/var/run/k3s-restarter-trap.pid
-    handler(){
-      sleep 5
-      /etc/init.d/k3s-service restart
-    }
-    trap handler SIGHUP
-    tail -f /dev/null & wait \\\$!
-  path: /opt/k3s-restarter
-  owner: root
-  permissions: '0755'
-- content: |
-    #!/sbin/openrc-run
-
-    supervisor=supervise-daemon
-    name="k3s-restarter"
-    command="/opt/k3s-restarter"
-    command_args=">/var/log/k3s-restarter.log 2>&1"
-
-    output_log=/var/log/k3s-restarter.log
-    error_log=/var/log/k3s-restarter.log
-
-    pidfile="/var/run/k3s-restarter.pid"
-    respawn_delay=5
-    respawn_max=0
-  path: /etc/init.d/k3s-restarter.service
-  owner: root
-  permissions: '0755'
-- content: |
-    options kvm ignore_msrs=1
-  path: /etc/modprobe.d/kvm.conf
-  owner: root
-  permissions: ''
-k3os:
-  modules:
-    - kvm
-    - vhost_net
-  dns_nameservers:
-    - 223.5.5.5
-    - 8.8.8.8
-  ntpServers:
-    - ntp.ubuntu.com
-  token: vagrant
-  password: vagrant
-  k3s_args:
-    - server
-    - --cluster-init
-    - --disable
-    - local-storage
-  labels:
-    svccontroller.k3s.cattle.io/enablelb: true
-EOF
-umount /mnt
-sudo rc-service ccapply restart
-sudo rc-service sshd restart
-SHELL
+      node.vm.provision :shell, :path => 'scripts/k3s-restarter-installer.sh'
+      node.vm.provision :shell, :path => 'scripts/config-first-server.sh',
+        :upload_path => '/home/rancher/vagrant-shell'
     end
   end
 end
@@ -124,70 +59,9 @@ Vagrant.configure("2") do |config|
         domain.storage :file, :size => '200G', :bus => 'virtio'
         domain.storage :file, :size => '100G', :bus => 'virtio'
       end
-      node.vm.provision 'shell',
-      upload_path: '/home/rancher/vagrant-shell',
-      inline: <<-SHELL
-      mkdir -p /mnt
-      mount /dev/vda1 /mnt
-      cat > /mnt/k3os/system/config.yaml <<EOF
-hostname: "k3os#{i}"
-boot_cmd:
-- rc-update add k3s-restarter.service
-write_files:
-- content: |
-    #!/usr/bin/env bash
-
-    echo "\\\$\\\$" >/var/run/k3s-restarter-trap.pid
-    handler(){
-      sleep 5
-      /etc/init.d/k3s-service restart
-    }
-    trap handler SIGHUP
-    tail -f /dev/null & wait \\\$!
-  path: /opt/k3s-restarter
-  owner: root
-  permissions: '0755'
-- content: |
-    #!/sbin/openrc-run
-
-    supervisor=supervise-daemon
-    name="k3s-restarter"
-    command="/opt/k3s-restarter"
-    command_args=">/var/log/k3s-restarter.log 2>&1"
-
-    output_log=/var/log/k3s-restarter.log
-    error_log=/var/log/k3s-restarter.log
-
-    pidfile="/var/run/k3s-restarter.pid"
-    respawn_delay=5
-    respawn_max=0
-  path: /etc/init.d/k3s-restarter.service
-  owner: root
-  permissions: '0755'
-- content: |
-    options kvm ignore_msrs=1
-  path: /etc/modprobe.d/kvm.conf
-  owner: root
-  permissions: ''
-k3os:
-  modules:
-    - kvm
-    - vhost_net
-  dns_nameservers:
-    - 223.5.5.5
-    - 8.8.8.8
-  ntpServers:
-    - ntp.ubuntu.com
-  token: vagrant
-  password: vagrant
-  k3s_args:
-    - agent
-  server_url: https://10.5.8.11:6443
-EOF
-umount /mnt
-sudo rc-service ccapply restart
-sudo rc-service sshd restart
-SHELL
+      node.vm.provision :shell, :path => 'scripts/k3s-restarter-installer.sh'
+      node.vm.provision :shell, :path => 'scripts/config-agent.sh',
+        :upload_path => '/home/rancher/vagrant-shell'
     end
   end
 end
