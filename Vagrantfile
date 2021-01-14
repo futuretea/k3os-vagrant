@@ -38,6 +38,44 @@ Vagrant.configure("2") do |config|
       mount /dev/vda1 /mnt
       cat > /mnt/k3os/system/config.yaml <<EOF
 hostname: "k3os#{i}"
+boot_cmd:
+- rc-update add k3s-restarter.service
+write_files:
+- content: |
+    #!/usr/bin/env bash
+
+    echo "\\\$\\\$" >/var/run/k3s-restarter-trap.pid
+    handler(){
+      sleep 5
+      /etc/init.d/k3s-service restart
+    }
+    trap handler SIGHUP
+    tail -f /dev/null & wait \\\$!
+  path: /opt/k3s-restarter
+  owner: root
+  permissions: '0755'
+- content: |
+    #!/sbin/openrc-run
+
+    supervisor=supervise-daemon
+    name="k3s-restarter"
+    command="/opt/k3s-restarter"
+    command_args=">/var/log/k3s-restarter.log 2>&1"
+
+    output_log=/var/log/k3s-restarter.log
+    error_log=/var/log/k3s-restarter.log
+
+    pidfile="/var/run/k3s-restarter.pid"
+    respawn_delay=5
+    respawn_max=0
+  path: /etc/init.d/k3s-restarter.service
+  owner: root
+  permissions: '0755'
+- content: |
+    options kvm ignore_msrs=1
+  path: /etc/modprobe.d/kvm.conf
+  owner: root
+  permissions: ''
 k3os:
   modules:
     - kvm
@@ -54,10 +92,12 @@ k3os:
     - --cluster-init
     - --disable
     - local-storage
-    - --node-label
-    - svccontroller.k3s.cattle.io/enablelb=true
+  labels:
+    svccontroller.k3s.cattle.io/enablelb: true
 EOF
-reboot
+umount /mnt
+sudo rc-service ccapply restart
+sudo rc-service sshd restart
 SHELL
     end
   end
@@ -91,6 +131,44 @@ Vagrant.configure("2") do |config|
       mount /dev/vda1 /mnt
       cat > /mnt/k3os/system/config.yaml <<EOF
 hostname: "k3os#{i}"
+boot_cmd:
+- rc-update add k3s-restarter.service
+write_files:
+- content: |
+    #!/usr/bin/env bash
+
+    echo "\\\$\\\$" >/var/run/k3s-restarter-trap.pid
+    handler(){
+      sleep 5
+      /etc/init.d/k3s-service restart
+    }
+    trap handler SIGHUP
+    tail -f /dev/null & wait \\\$!
+  path: /opt/k3s-restarter
+  owner: root
+  permissions: '0755'
+- content: |
+    #!/sbin/openrc-run
+
+    supervisor=supervise-daemon
+    name="k3s-restarter"
+    command="/opt/k3s-restarter"
+    command_args=">/var/log/k3s-restarter.log 2>&1"
+
+    output_log=/var/log/k3s-restarter.log
+    error_log=/var/log/k3s-restarter.log
+
+    pidfile="/var/run/k3s-restarter.pid"
+    respawn_delay=5
+    respawn_max=0
+  path: /etc/init.d/k3s-restarter.service
+  owner: root
+  permissions: '0755'
+- content: |
+    options kvm ignore_msrs=1
+  path: /etc/modprobe.d/kvm.conf
+  owner: root
+  permissions: ''
 k3os:
   modules:
     - kvm
@@ -106,7 +184,9 @@ k3os:
     - agent
   server_url: https://10.5.8.11:6443
 EOF
-reboot
+umount /mnt
+sudo rc-service ccapply restart
+sudo rc-service sshd restart
 SHELL
     end
   end
