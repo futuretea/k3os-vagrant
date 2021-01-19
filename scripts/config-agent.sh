@@ -4,7 +4,7 @@
 mkdir -p /mnt
 mount /dev/vda1 /mnt
 cat > /mnt/k3os/system/config.yaml <<EOF
-hostname: "k3os#{i}"
+write_files:
 - content: |
     options kvm ignore_msrs=1
   path: /etc/modprobe.d/kvm.conf

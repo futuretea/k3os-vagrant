@@ -31,7 +31,8 @@ Vagrant.configure("2") do |config|
         domain.storage :file, :size => '200G', :bus => 'virtio'
         domain.storage :file, :size => '100G', :bus => 'virtio'
       end
-      node.vm.provision :shell, :path => 'scripts/k3s-restarter-installer.sh'
+      node.vm.provision :shell, :path => 'scripts/k3s-restarter-installer.sh',
+        :upload_path => '/home/rancher/vagrant-shell'
       node.vm.provision :shell, :path => 'scripts/config-first-server.sh',
         :upload_path => '/home/rancher/vagrant-shell'
     end
@@ -59,7 +60,8 @@ Vagrant.configure("2") do |config|
         domain.storage :file, :size => '200G', :bus => 'virtio'
         domain.storage :file, :size => '100G', :bus => 'virtio'
       end
-      node.vm.provision :shell, :path => 'scripts/k3s-restarter-installer.sh'
+      node.vm.provision :shell, :path => 'scripts/k3s-restarter-installer.sh',
+        :upload_path => '/home/rancher/vagrant-shell'
       node.vm.provision :shell, :path => 'scripts/config-agent.sh',
         :upload_path => '/home/rancher/vagrant-shell'
     end
